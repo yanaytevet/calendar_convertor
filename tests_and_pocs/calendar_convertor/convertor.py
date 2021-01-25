@@ -46,8 +46,11 @@ class Convertor:
                     meeting_to_text_elements[meeting].append(text_element)
                     break
 
+        res = []
         for meeting, text_elements in meeting_to_text_elements.items():
-            text = "\n".join(text_element.text[::-1] for text_element in text_elements)
+            text = "\n".join(text_element.text for text_element in text_elements)
             meeting.text = text
+            if text:
+                res.append(meeting)
 
-        return list(meeting_to_text_elements.keys())
+        return res

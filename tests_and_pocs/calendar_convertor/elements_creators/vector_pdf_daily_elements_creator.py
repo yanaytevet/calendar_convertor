@@ -111,6 +111,7 @@ class VectorPdfDailyElementsCreator(ElementsCreator):
                 text = span["text"]
                 bbox = span["bbox"]
                 if current_hour_ind == self.MAX_HOUR_IND:
+                    text = self.fix_text(text)
                     texts_elements.append(TextElement(
                         top=bbox[1],
                         left=bbox[0],
