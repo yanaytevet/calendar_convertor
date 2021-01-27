@@ -1,0 +1,91 @@
+from werkzeug.datastructures import FileStorage
+
+from calendar_convertor.common.time_utils import TimeUtils
+from calendar_convertor.meetings.meeting import Meeting
+from calendar_convertor.meetings.meetings_creator.daily_meeting_creator import DailyMeetingCreator
+from calendar_convertor.meetings.meetings_creator.meeting_creator import MeetingCreator
+from tests.meetings_creator.base_test_meeting_creator import BaseTestMeetingCreator
+
+
+class TestDailyMeetingCreator(BaseTestMeetingCreator):
+
+    @classmethod
+    def get_creator(cls, file_obj: FileStorage) -> MeetingCreator:
+        return DailyMeetingCreator(file_obj)
+
+    def test_daily_1(self):
+        self.assert_file("daily/daily_1", [
+            Meeting(text="אבי חליבה - ס 'נ.ש.מ",
+                    location="אצל שאול\nשאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 8, 30),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 9, 15)),
+            Meeting(text="יוגב + לוריא",
+                    location="אצל שאול ; שאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 9, 30),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 10, 0)),
+            Meeting(text="פגישת היכרות עם שי-לי שפיגלמן -ישראל דיגיטלית",
+                    location="אצל שאול ,משרד האוצר קפלן 1 קומה 2 חדר226\nשאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 11, 30),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 12, 30)),
+            Meeting(text="עופר שוטפים",
+                    location="אצל שאול ; שאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 13, 30),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 14, 0)),
+            Meeting(text="חברת חשמל -עופר בלוך",
+                    location="אצל סגן השר ;יצחק כהן",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 13, 45),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 14, 15)),
+            Meeting(text="סולקנים :סגן השר,\nשאול מרידור ,ינקי",
+                    location="אצל סגן שר האוצר יצחק כ\nיצחק כהן",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 14, 0),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 15, 0)),
+            Meeting(text="ישיבת הנהלה",
+                    location="אצל שאול ;שאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 15, 0),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 15, 30)),
+            Meeting(text="הכנה לרוביק",
+                    location="אצל שאול ; שאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 15, 45),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 16, 15)),
+            Meeting(text="נסיעות שיתופיות",
+                    location="אצל שאול\nשאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 16, 0),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 17, 0)),
+            Meeting(text="עם ר 'עירית באר-שבע",
+                    location="אצל שאול\nשאול מרידור",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 17, 0),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 18, 0)),
+        ])
+
+    def test_daily_4(self):
+        self.assert_file("daily/daily_4", [])
+
+    def test_daily_5(self):
+        self.assert_file("daily/daily_5", [
+            Meeting(text="סיור עם צוות חינוך",
+                    location="""ליבורנו 17 בת ים ,בי"ס הנשיא שמורה לךחנייה מול בית הספר ברחבת בית הכנסת\n)לכשתגיע למקום ליצור קשר עם מיטל( 052-3604065\nשאול מרידור""",
+                    start_time=TimeUtils.create_aware_datetime(2019, 1, 10, 8, 30),
+                    end_time=TimeUtils.create_aware_datetime(2019, 1, 10, 14, 30)),
+        ])
+
+    def test_daily_6(self):
+        self.assert_file("daily/daily_6", [
+            Meeting(text="ישיבת צוותים - 2050  הישיבה תתקיים בזום",
+                    location="""ל .מנכ"ל\nאודי אדירי""",
+                    start_time=TimeUtils.create_aware_datetime(2020, 4, 1, 9, 30),
+                    end_time=TimeUtils.create_aware_datetime(2020, 4, 1, 10, 30),
+                    ),
+            Meeting(text="""שיחת זום פתוחה לכלל עובדי המשרד - עם מנכ"ל המשרד""",
+                    location="אודי אדירי",
+                    start_time=TimeUtils.create_aware_datetime(2020, 4, 1, 11, 0),
+                    end_time=TimeUtils.create_aware_datetime(2020, 4, 1, 12, 0),
+                    ),
+            Meeting(text="הנהלה - הישיבה תתקיים בזום",
+                    location="אודי אדירי",
+                    start_time=TimeUtils.create_aware_datetime(2020, 4, 1, 13, 00),
+                    end_time=TimeUtils.create_aware_datetime(2020, 4, 1, 14, 30),
+                    ),
+        ])
+
+    def test_daily_8(self):
+        self.assert_file("daily/daily_8", [])

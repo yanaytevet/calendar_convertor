@@ -9,7 +9,8 @@ from calendar_convertor.elements.text_element import TextElement
 
 @dataclass
 class ElementsCollection:
-    text_elements: List[TextElement]
+    upper_text_elements: List[TextElement]
+    lower_text_elements: List[TextElement]
     meeting_elements: List[Element]
     hour_elements: List[HourElement]
     date_elements: List[DateElement]

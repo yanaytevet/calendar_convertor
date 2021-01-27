@@ -2,6 +2,7 @@ import re
 from typing import List, BinaryIO, Pattern, Tuple
 
 import fitz
+from werkzeug.datastructures import FileStorage
 
 from calendar_convertor.common.pdf_string_utils import PdfStringUtils
 from calendar_convertor.common.time_utils import TimeUtils
@@ -33,14 +34,15 @@ class DailyMeetingCreator(MeetingCreator):
     WANTED_HOURS = ["07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18"]
     MAX_HOUR_IND = 12
 
-    def __init__(self, pdf_file: BinaryIO):
+    def __init__(self, pdf_file: FileStorage):
         super().__init__(pdf_file)
         self.regex_obj: Pattern = re.compile("\d+ \S+ \d+")
 
     def create_meetings_from_page(self, pdf_page: fitz.Page) -> List[Meeting]:
-        hour_elements, text_elements = self.get_time_and_text_elements(pdf_page)
+        hour_elements, upper_text_elements, lower_text_elements = self.get_time_and_text_elements(pdf_page)
         collections = ElementsCollection(
-            text_elements=text_elements,
+            upper_text_elements=upper_text_elements,
+            lower_text_elements=lower_text_elements,
             meeting_elements=self.get_meeting_elements(pdf_page),
             hour_elements=hour_elements,
             date_elements=self.get_date_elements(pdf_page),
@@ -95,37 +97,44 @@ class DailyMeetingCreator(MeetingCreator):
             ]
         return []
 
-    def get_time_and_text_elements(self, pdf_page: fitz.Page) -> Tuple[List[HourElement], List[TextElement]]:
-        texts_elements = []
+    def get_time_and_text_elements(self, pdf_page: fitz.Page) -> Tuple[List[HourElement], List[TextElement], List[TextElement]]:
+        upper_texts_elements = []
+        lower_texts_elements = []
         hours_elements = []
         current_hour_ind = 0
         for text_block in pdf_page.get_text('dict')["blocks"]:
             if "lines" not in text_block:
                 continue
             lines = text_block["lines"]
-            spans = lines[0]["spans"]
-            for span in spans:
-                text = span["text"]
-                bbox = span["bbox"]
-                if current_hour_ind == self.MAX_HOUR_IND:
-                    text = PdfStringUtils.fix_text(text)
-                    texts_elements.append(TextElement(
-                        top=bbox[1],
-                        left=bbox[0],
-                        bottom=bbox[3],
-                        right=bbox[2],
-                        text=text,
-                    ))
-                elif self.WANTED_HOURS[current_hour_ind] == text:
-                    hours_elements.append(HourElement(
-                        top=bbox[1],
-                        left=bbox[0],
-                        bottom=bbox[3],
-                        right=bbox[2],
-                        hour=int(text),
-                    ))
-                    current_hour_ind += 1
-                else:
-                    current_hour_ind = 0
-                    hours_elements = []
-        return hours_elements, texts_elements
+            for line in lines:
+                spans = line["spans"]
+                for span in spans:
+                    upper = "bold" in span["font"].lower()
+                    text = span["text"]
+                    bbox = span["bbox"]
+                    if current_hour_ind == self.MAX_HOUR_IND:
+                        text = PdfStringUtils.fix_text(text)
+                        text_element = TextElement(
+                            top=bbox[1],
+                            left=bbox[0],
+                            bottom=bbox[3],
+                            right=bbox[2],
+                            text=text,
+                        )
+                        if upper:
+                            upper_texts_elements.append(text_element)
+                        else:
+                            lower_texts_elements.append(text_element)
+                    elif self.WANTED_HOURS[current_hour_ind] == text:
+                        hours_elements.append(HourElement(
+                            top=bbox[1],
+                            left=bbox[0],
+                            bottom=bbox[3],
+                            right=bbox[2],
+                            hour=int(text),
+                        ))
+                        current_hour_ind += 1
+                    else:
+                        current_hour_ind = 0
+                        hours_elements = []
+        return hours_elements, upper_texts_elements, lower_texts_elements
