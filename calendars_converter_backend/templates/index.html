@@ -1,0 +1,56 @@
+<html>
+  <head>
+    <title>PDF Calendars Converter</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: linear-gradient(-135deg, #b0ffeb, #ffffff);
+        }
+
+        .main-container {
+            border-radius: 8px;
+            border: #56c5a5 1px solid;
+            background-color: #f1f1f1;
+            box-shadow: #3b8771 4px 4px 4px 2px;
+            width: 75%;
+            height: 75%;
+            padding: 8px;
+        }
+
+        .file-form {
+            {#display: flex;#}
+            {#flex-direction: column;#}
+        }
+
+        .select-type {
+            max-width: 300px;
+        }
+    </style>
+    <script>
+        function validateForm() {
+          var x = document.forms["fileForm"]["fname"].value;
+          if (x == "") {
+            alert("Name must be filled out");
+            return false;
+          }
+        }
+    </script>
+  </head>
+  <body>
+    <div class="main-container">
+        <form name="fileForm" action="/convert-file" onsubmit="return validateForm()" method="post" class="file-form"
+            enctype="multipart/form-data">
+            <select name="calendar_type" class="select-type">
+                <option value="daily">Daily</option>
+                <option value="weekly_1">Weekly 1</option>
+                <option value="weekly_2">Weekly 2</option>
+                <option value="table">Table</option>
+            </select>
+            <input type="file" id="uploadedfile" name="uploadedfile">
+            <input type="submit" value="Translate">
+        </form>
+    </div>
+  </body>
+</html>
