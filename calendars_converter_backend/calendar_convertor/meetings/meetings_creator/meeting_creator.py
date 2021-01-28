@@ -27,7 +27,8 @@ class MeetingCreator(ABC):
         res = []
         self.init()
         for pdf_page in self.pdf_document:
-            res.extend(self.create_meetings_from_page(pdf_page))
+            meetings = self.create_meetings_from_page(pdf_page)
+            res.extend(meetings)
         return res
 
     def init(self):
@@ -68,12 +69,12 @@ class MeetingCreator(ABC):
 
         res = []
         for meeting, text_elements in meeting_to_upper_text_elements.items():
-            text = "\n".join(text_element.text for text_element in text_elements)
+            text = "; ".join(text_element.text for text_element in text_elements)
             meeting.text = text
             if text:
                 res.append(meeting)
         for meeting, text_elements in meeting_to_lower_text_elements.items():
-            text = "\n".join(text_element.text for text_element in text_elements)
+            text = "; ".join(text_element.text for text_element in text_elements)
             meeting.location = text
 
         return res

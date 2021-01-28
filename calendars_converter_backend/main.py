@@ -15,7 +15,6 @@ def convert_file():
     file = request.files['uploadedfile']
     calendar_type = request.form.get('calendar_type')
     xls_io, file_name = CalendarConverter(file, calendar_type).convert_to_xls()
-    print(xls_io)
     return send_file(
         xls_io,
         as_attachment=True,

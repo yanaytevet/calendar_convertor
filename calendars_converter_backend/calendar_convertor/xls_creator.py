@@ -31,12 +31,8 @@ class XlsCreator:
             worksheet.write(index, 1, meeting.end_time.strftime(self.TIME_FORMAT))
             worksheet.write(index, 2, meeting.text)
             worksheet.write(index, 3, meeting.location)
-            lines_count = meeting.text.count("\n")
-            if lines_count > 0:
-                worksheet.set_row(index, lines_count * 20 + 10)
             index += 1
 
         workbook.close()
         output.seek(0)
-        print(output)
         return output

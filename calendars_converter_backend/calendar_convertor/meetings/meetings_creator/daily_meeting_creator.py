@@ -109,7 +109,8 @@ class DailyMeetingCreator(MeetingCreator):
             for line in lines:
                 spans = line["spans"]
                 for span in spans:
-                    upper = "bold" in span["font"].lower()
+                    lower_font = span["font"].lower()
+                    upper = "bold" in lower_font or "f2" in lower_font
                     text = span["text"]
                     bbox = span["bbox"]
                     if current_hour_ind == self.MAX_HOUR_IND:

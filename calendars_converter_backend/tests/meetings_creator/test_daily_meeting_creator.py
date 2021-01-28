@@ -16,7 +16,7 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
     def test_daily_1(self):
         self.assert_file("daily/daily_1", [
             Meeting(text="אבי חליבה - ס 'נ.ש.מ",
-                    location="אצל שאול\nשאול מרידור",
+                    location="אצל שאול; שאול מרידור",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 8, 30),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 9, 15)),
             Meeting(text="יוגב + לוריא",
@@ -24,7 +24,7 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 9, 30),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 10, 0)),
             Meeting(text="פגישת היכרות עם שי-לי שפיגלמן -ישראל דיגיטלית",
-                    location="אצל שאול ,משרד האוצר קפלן 1 קומה 2 חדר226\nשאול מרידור",
+                    location="אצל שאול ,משרד האוצר קפלן 1 קומה 2 חדר226; שאול מרידור",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 11, 30),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 12, 30)),
             Meeting(text="עופר שוטפים",
@@ -35,8 +35,8 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
                     location="אצל סגן השר ;יצחק כהן",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 13, 45),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 14, 15)),
-            Meeting(text="סולקנים :סגן השר,\nשאול מרידור ,ינקי",
-                    location="אצל סגן שר האוצר יצחק כ\nיצחק כהן",
+            Meeting(text="סולקנים :סגן השר,; שאול מרידור ,ינקי",
+                    location="אצל סגן שר האוצר יצחק כ; יצחק כהן",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 14, 0),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 15, 0)),
             Meeting(text="ישיבת הנהלה",
@@ -48,11 +48,11 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 15, 45),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 16, 15)),
             Meeting(text="נסיעות שיתופיות",
-                    location="אצל שאול\nשאול מרידור",
+                    location="אצל שאול; שאול מרידור",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 16, 0),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 17, 0)),
             Meeting(text="עם ר 'עירית באר-שבע",
-                    location="אצל שאול\nשאול מרידור",
+                    location="אצל שאול; שאול מרידור",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 2, 17, 0),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 2, 18, 0)),
         ])
@@ -63,7 +63,7 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
     def test_daily_5(self):
         self.assert_file("daily/daily_5", [
             Meeting(text="סיור עם צוות חינוך",
-                    location="""ליבורנו 17 בת ים ,בי"ס הנשיא שמורה לךחנייה מול בית הספר ברחבת בית הכנסת\n)לכשתגיע למקום ליצור קשר עם מיטל( 052-3604065\nשאול מרידור""",
+                    location="""ליבורנו 17 בת ים ,בי"ס הנשיא שמורה לךחנייה מול בית הספר ברחבת בית הכנסת; )לכשתגיע למקום ליצור קשר עם מיטל( 052-3604065; שאול מרידור""",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 10, 8, 30),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 10, 14, 30)),
         ])
@@ -71,7 +71,7 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
     def test_daily_6(self):
         self.assert_file("daily/daily_6", [
             Meeting(text="ישיבת צוותים - 2050  הישיבה תתקיים בזום",
-                    location="""ל .מנכ"ל\nאודי אדירי""",
+                    location="""ל .מנכ"ל; אודי אדירי""",
                     start_time=TimeUtils.create_aware_datetime(2020, 4, 1, 9, 30),
                     end_time=TimeUtils.create_aware_datetime(2020, 4, 1, 10, 30),
                     ),
