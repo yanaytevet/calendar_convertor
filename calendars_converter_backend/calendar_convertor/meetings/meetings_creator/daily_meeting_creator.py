@@ -1,5 +1,5 @@
 import re
-from typing import List, BinaryIO, Pattern, Tuple
+from typing import List, Pattern, Tuple
 
 import fitz
 from werkzeug.datastructures import FileStorage
@@ -13,10 +13,10 @@ from calendar_convertor.elements.elements_collection import ElementsCollection
 from calendar_convertor.elements.hour_element import HourElement
 from calendar_convertor.elements.text_element import TextElement
 from calendar_convertor.meetings.meeting import Meeting
-from calendar_convertor.meetings.meetings_creator.meeting_creator import MeetingCreator
+from calendar_convertor.meetings.meetings_creator.fitz_meeting_creator import FitzMeetingCreator
 
 
-class DailyMeetingCreator(MeetingCreator):
+class DailyMeetingCreator(FitzMeetingCreator):
     MONTHS_MAP = {
         "ראוני": "Jan",
         "ראורבפ": "Feb",
@@ -139,3 +139,6 @@ class DailyMeetingCreator(MeetingCreator):
                         current_hour_ind = 0
                         hours_elements = []
         return hours_elements, upper_texts_elements, lower_texts_elements
+
+    def get_errors(self) -> List[JSONType]:
+        return []

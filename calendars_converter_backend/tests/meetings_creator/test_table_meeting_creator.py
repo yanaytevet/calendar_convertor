@@ -12,46 +12,17 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
     def get_creator(cls, file_obj: FileStorage) -> MeetingCreator:
         return TableMeetingCreator(file_obj)
 
-    def test_table_1(self):
-        meetings = self.get_meetings("table/table_1")
-        self.assert_meetings_len(meetings, 417)
-        self.assert_meetings_indexes(
-            [
-                (0, Meeting(text="‫דיוני תקציב - אצל רעיה",
-                            location="",
-                            start_time=TimeUtils.create_aware_datetime(2020, 7, 1),
-                            end_time=TimeUtils.create_aware_datetime(2020, 7, 2))),
-                (3, Meeting(text="""פורום הנהלה zoom‬""",
-                            location="‬",
-                            start_time=TimeUtils.create_aware_datetime(2020, 7, 1, 12),
-                            end_time=TimeUtils.create_aware_datetime(2020, 7, 1, 13, 30))),
-                (20, Meeting(text="""שיחת התייעצות - אמיר הלוי + יעל דניאלי + מלונאים zoom‬""",
-                             location="‬",
-                             start_time=TimeUtils.create_aware_datetime(2020, 7, 6, 9, 30),
-                             end_time=TimeUtils.create_aware_datetime(2020, 7, 6, 11, 0))),
-                (58, Meeting(text="""מתווה מלונאים לשכת מנכ"ל""",
-                             location="‬",
-                             start_time=TimeUtils.create_aware_datetime(2020, 7, 12, 16),
-                             end_time=TimeUtils.create_aware_datetime(2020, 7, 12, 16, 30))),
-                (100, Meeting(text="""קובי זוסמן קומה 2‬""",
-                              location="‬",
-                              start_time=TimeUtils.create_aware_datetime(2020, 7, 15, 19),
-                              end_time=TimeUtils.create_aware_datetime(2020, 7, 15, 19, 30))),
-            ],
-            meetings
-        )
-
     def test_table_3(self):
         meetings = self.get_meetings("table/table_3")
-        self.assert_meetings_len(meetings, 140)
-        # self.print_meetings(meetings, 100)
+        self.assert_meetings_len(meetings, 139)
+        # self.print_meetings(meetings, 0)
         self.assert_meetings_indexes(
             [
                 (0, Meeting(text="תקשורת",
                             location="",
                             start_time=TimeUtils.create_aware_datetime(2020, 8, 2, 9),
                             end_time=None)),
-                (1, Meeting(text="ישבת שרינו כחול - לבן",
+                (1, Meeting(text="ישבת שרינו כחול-לבן",
                             location="",
                             start_time=TimeUtils.create_aware_datetime(2020, 8, 2, 9, 30),
                             end_time=None)),
@@ -73,7 +44,7 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
 
     def test_table_4(self):
         meetings = self.get_meetings("table/table_4")
-        self.assert_meetings_len(meetings, 95)
+        self.assert_meetings_len(meetings, 93)
         self.assert_meetings_indexes(
             [
                 (0, Meeting(text="‫השבעת‬ ‫הממשלה‬",
@@ -113,7 +84,7 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
                              location='אצל מנכ"ל',
                              start_time=TimeUtils.create_aware_datetime(2019, 6, 10, 14, 0),
                              end_time=TimeUtils.create_aware_datetime(2019, 6, 10, 16, 30))),
-                (39, Meeting(text='עבודה על מצגת ונאום GC 4 I',
+                (39, Meeting(text='עבודה על מצגת ונאום GC4I',
                              location='משרדו של המנכ"ל',
                              start_time=TimeUtils.create_aware_datetime(2019, 6, 16, 16, 30),
                              end_time=TimeUtils.create_aware_datetime(2019, 6, 16, 17, 0))),
@@ -127,9 +98,54 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
 
     def test_table_6(self):
         meetings = self.get_meetings("table/table_6")
+        self.assert_meetings_len(meetings, 200)
+        self.assert_meetings_indexes(
+            [
+                (0, Meeting(
+                    text="שלום דסקל     תוכנית להגדלת התעסוקה בהייטק  2,להקמת מרכזי מצוינות 0 אלף\rמשרות על פני 5 שנים",
+                    location='לשכת שר י-ם',
+                    start_time=TimeUtils.create_aware_datetime(2020, 6, 1, 12, 0),
+                    end_time=TimeUtils.create_aware_datetime(2020, 6, 1, 12, 30))),
+                (1, Meeting(text='פ.היכרות-איילת זלדין',
+                            location='ל.מנכ"ל י-ם',
+                            start_time=TimeUtils.create_aware_datetime(2020, 6, 1, 13, 0),
+                            end_time=TimeUtils.create_aware_datetime(2020, 6, 1, 13, 30))),
+                (28, Meeting(text='נסיעה לקרייה בתל אביב',
+                             location='',
+                             start_time=TimeUtils.create_aware_datetime(2020, 6, 4, 13, 0),
+                             end_time=TimeUtils.create_aware_datetime(2020, 6, 4, 13, 30))),
+                (50, Meeting(text="הפורום הכלכלי -מס ,2' יום ב׳ 8 ביוני 2020",
+                             location='בני ברק',
+                             start_time=TimeUtils.create_aware_datetime(2020, 6, 8, 18),
+                             end_time=TimeUtils.create_aware_datetime(2020, 6, 8, 19, 30))),
+            ],
+            meetings
+        )
 
     def test_table_8(self):
         meetings = self.get_meetings("table/table_8")
 
     def test_table_9(self):
         meetings = self.get_meetings("table/table_9")
+        self.assert_meetings_len(meetings, 317)
+        self.assert_meetings_indexes(
+            [
+                (0, Meeting(text="ראש מועצת עמנואל – אליהו גפני",
+                            location='',
+                            start_time=TimeUtils.create_aware_datetime(2020, 1, 1, 9, 0),
+                            end_time=TimeUtils.create_aware_datetime(2020, 1, 1, 10, 0))),
+                (1, Meeting(text="שי חג'ג (ראש מועצת מרחבים)",
+                            location='',
+                            start_time=TimeUtils.create_aware_datetime(2020, 1, 1, 10, 30),
+                            end_time=TimeUtils.create_aware_datetime(2020, 1, 1, 11, 0))),
+                (28, Meeting(text='ישיבת ממשלה',
+                             location='',
+                             start_time=TimeUtils.create_aware_datetime(2020, 1, 12, 10, 30),
+                             end_time=TimeUtils.create_aware_datetime(2020, 1, 12, 11, 30))),
+                (50, Meeting(text="שלומי מגנזי סגן ראש מועצה מטה יהודה  18:00-",
+                             location='',
+                             start_time=TimeUtils.create_aware_datetime(2020, 1, 15, 18),
+                             end_time=TimeUtils.create_aware_datetime(2020, 1, 15, 18, 30))),
+            ],
+            meetings
+        )

@@ -1,8 +1,9 @@
 import io
-from typing import List, BinaryIO
+from typing import List, BinaryIO, Optional, Any
 
 import xlsxwriter
 
+from calendar_convertor.common.type_hints import JSONType
 from calendar_convertor.meetings.meeting import Meeting
 
 
@@ -12,7 +13,7 @@ class XlsCreator:
     def __init__(self):
         pass
 
-    def create_file(self, meetings: List[Meeting]) -> BinaryIO:
+    def create_file(self, meetings: List[Meeting], errors: Optional[List[JSONType]] = None) -> BinaryIO:
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         worksheet = workbook.add_worksheet()
@@ -32,6 +33,14 @@ class XlsCreator:
             worksheet.write(index, 2, meeting.text)
             worksheet.write(index, 3, meeting.location)
             index += 1
+
+        if errors:
+            worksheet.write(index, 0, "errors")
+            index += 1
+            for error in errors:
+                for column_index, value in enumerate(error):
+                    worksheet.write(index, column_index, str(value))
+                index += 1
 
         workbook.close()
         output.seek(0)

@@ -1,68 +1,142 @@
-from typing import List, Tuple, Optional
+import re
+from typing import List, Optional
 
-import fitz
+import pandas as pd
+from pandas import DataFrame, Series
 from werkzeug.datastructures import FileStorage
 
 from calendar_convertor.common.pdf_string_utils import PdfStringUtils
 from calendar_convertor.common.time_utils import TimeUtils
-from calendar_convertor.common.type_hints import TimeType
+from calendar_convertor.common.type_hints import TimeType, JSONType
 from calendar_convertor.meetings.meeting import Meeting
-from calendar_convertor.meetings.meetings_creator.meeting_creator import MeetingCreator
-from calendar_convertor.meetings.meetings_creator.table_rows_converter.table_rows_converter import TableRowsConverter
-from calendar_convertor.meetings.meetings_creator.table_rows_converter.table_rows_converter_1 import TableRowsConverter1
-from calendar_convertor.meetings.meetings_creator.table_rows_converter.table_rows_converter_3 import TableRowsConverter3
-from calendar_convertor.meetings.meetings_creator.table_rows_converter.table_rows_converter_4 import TableRowsConverter4
-from calendar_convertor.meetings.meetings_creator.table_rows_converter.table_rows_converter_5 import TableRowsConverter5
+from calendar_convertor.meetings.meetings_creator.tabula_meeting_creator import TabulaMeetingCreator
+from dateutil.parser import parse
 
 
-class TableMeetingCreator(MeetingCreator):
-    FIRST_LINE_1 = '''אשונ
-םוקימ
-הלחתה
-ףוס
-'''
-    FIRST_LINE_3 = """הלחתה ךיראת
- 
-הלחתה תעש
- 
-אשונ
- 
-"""
-    FIRST_LINE_4 = """ךיראת
- הלחתה תעש
- םויס תעש
-אשונ
- םוקימ
-"""
-    FIRST_LINE_5 = '''דסמ
-אשונ
-הלחתה ךיראת
-הלחתה תעש
-םויס תעש
-םוקימ
-'''
+class TableMeetingCreator(TabulaMeetingCreator):
+    TEXT = "נושא"
+    LOCATION = "מיקום"
+    END_DATE = ["תאריך סיו", "תאריך סו"]
+    START_DATE = ["תאריך התחלה", "תאריך"]
+    START_HOUR = ["התחלה", "עת התחל"]
+    END_HOUR = ["סוף", "סיום", "עת סו", "עת סיו"]
+    STR_TO_REMOVE = ["zoom", "zoon", "ZOOM"]
 
     def __init__(self, pdf_file: FileStorage):
         super().__init__(pdf_file)
-        self.table_rows_converter: Optional[TableRowsConverter] = None
+        self.text_index = None
+        self.location_index = None
+        self.start_date_index = None
+        self.end_date_index = None
+        self.start_hour_index = None
+        self.end_hour_index = None
+        self.last_date_str = ""
+        self.error_rows = []
 
-    def create_meetings_from_page(self, pdf_page: fitz.Page) -> List[Meeting]:
-        blocks = pdf_page.get_text("blocks", flags=fitz.TEXT_PRESERVE_SPANS)
-        if pdf_page.number == 0:
-            first_line_text = blocks[0][4]
-            self.set_converter_from_first_line(first_line_text)
+    def create_meetings_from_df(self, df: DataFrame) -> List[Meeting]:
+        if self.should_set_column_indexes():
+            self.set_column_indexes(df)
 
-        return self.table_rows_converter.create_meetings(blocks, page_number=pdf_page.number)
+        meetings = []
+        for _, row in df.iterrows():
+            meeting = self.convert_row_to_meeting(row)
+            if meeting:
+                meetings.append(meeting)
+        return meetings
 
-    def set_converter_from_first_line(self, first_line_text: str) -> None:
-        # print(f"first_line_text '{first_line_text}'")
-        if first_line_text == self.FIRST_LINE_1:
-            self.table_rows_converter = TableRowsConverter1()
-        elif first_line_text == self.FIRST_LINE_3:
-            self.table_rows_converter = TableRowsConverter3()
-        elif first_line_text == self.FIRST_LINE_4:
-            self.table_rows_converter = TableRowsConverter4()
-        elif first_line_text == self.FIRST_LINE_5:
-            self.table_rows_converter = TableRowsConverter5()
+    def should_set_column_indexes(self) -> None:
+        return self.text_index is None
+
+    def set_column_indexes(self, df: DataFrame) -> None:
+        first_line = df.iloc[0]
+        for column_index, value in first_line.iteritems():
+            value = str(value)
+            if value == self.TEXT:
+                self.text_index = column_index
+            elif value == self.LOCATION:
+                self.location_index = column_index
+            elif self.is_contained(value, self.END_DATE):
+                self.end_date_index = column_index
+            elif self.is_contained(value, self.START_DATE):
+                self.start_date_index = column_index
+            elif self.is_contained(value, self.START_HOUR):
+                self.start_hour_index = column_index
+            elif self.is_contained(value, self.END_HOUR):
+                self.end_hour_index = column_index
+        if self.end_date_index is None:
+            self.end_date_index = self.start_date_index
+
+    def is_contained(self, value: str, options: List[str]) -> bool:
+        for option in options:
+            if option in value:
+                return True
+        return False
+
+    def is_row_headers(self, row: Series) -> bool:
+        return row[self.text_index] == self.TEXT
+
+    def convert_row_to_meeting(self, row: Series) -> Optional[Meeting]:
+        try:
+            if self.is_row_headers(row):
+                return None
+            text = row[self.text_index]
+            location = self.get_location(row)
+
+            start_time = self.get_start_time_from_row(row)
+            end_time = self.get_end_time_from_row(row)
+            if start_time is None:
+                return None
+            meeting = Meeting(
+                text=text,
+                location=location,
+                start_time=start_time,
+                end_time=end_time,
+            )
+            self.fix_meeting_time(meeting)
+            return meeting
+        except Exception:
+            self.error_rows.append(row)
+
+    def get_location(self, row: Series) -> str:
+        location = row[self.location_index] if self.location_index is not None else ""
+        if pd.isna(location):
+            return ""
+        return location
+
+    def get_start_time_from_row(self, row: Series) -> Optional[TimeType]:
+        if self.start_date_index is not None:
+            date_str = row[self.start_date_index]
+            if not pd.isna(date_str):
+                self.last_date_str = date_str
+            else:
+                date_str = self.last_date_str
+            time_str = f"{date_str} {row[self.start_hour_index]}"
         else:
-            raise Exception("Unknown Format")
+            time_str = f"{row[self.start_hour_index]}"
+        time_str = self.fix_time_str(time_str)
+        return TimeUtils.make_aware(parse(time_str, dayfirst=True))
+
+    def get_end_time_from_row(self, row: Series) -> Optional[TimeType]:
+        if self.end_hour_index is None:
+            return None
+        if self.end_date_index is not None:
+            date_str = row[self.end_date_index]
+            if not pd.isna(date_str):
+                self.last_date_str = date_str
+            else:
+                date_str = self.last_date_str
+            time_str = f"{date_str} {row[self.end_hour_index]}"
+        else:
+            time_str = f"{row[self.end_hour_index]}"
+        time_str = self.fix_time_str(time_str)
+        return TimeUtils.make_aware(parse(time_str, dayfirst=True))
+
+    def fix_time_str(self, time_str: str) -> str:
+        time_str = PdfStringUtils.remove_non_ascii(time_str)
+        for str_to_remove in self.STR_TO_REMOVE:
+            time_str = time_str.split(str_to_remove)[0]
+        time_str = re.sub(':(\d\d)(\d\d)/', r':\1 \2/', time_str)
+        return time_str.strip()
+
+    def get_errors(self) -> List[JSONType]:
+        return [list(row.to_dict().values()) for row in self.error_rows]

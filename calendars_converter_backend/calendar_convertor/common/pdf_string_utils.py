@@ -1,8 +1,12 @@
 
 class PdfStringUtils:
     @classmethod
-    def is_ascii(cls, letter):
+    def is_ascii(cls, letter: chr) -> bool:
         return ord(letter) < 128
+
+    @classmethod
+    def remove_non_ascii(cls, word: str) -> str:
+        return "".join(filter(cls.is_ascii, word))
 
     @classmethod
     def fix_text(cls, text: str) -> str:

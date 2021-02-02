@@ -13,7 +13,13 @@ class BaseTestMeetingCreator(unittest.TestCase):
     def get_meetings(self, file_name: str) -> List[Meeting]:
         with open(f"data/{file_name}.pdf", "rb") as f:
             file_obj = FileStorage(f, filename=file_name)
-            meetings = self.get_creator(file_obj).get_meetings()
+            creator = self.get_creator(file_obj)
+            meetings = creator.get_meetings()
+            errors = creator.get_errors()
+            if errors:
+                print("Errors:")
+                for error in errors:
+                    print(error)
         return meetings
 
     def print_meetings(self, meetings: List[Meeting], index: int) -> None:
@@ -31,10 +37,10 @@ class BaseTestMeetingCreator(unittest.TestCase):
     def assert_meetings_indexes(self, wanted_meetings_indexes: List[Tuple[int, Meeting]], actual_meetings: List[Meeting]) -> None:
         for index, meeting in wanted_meetings_indexes:
             actual_meeting = actual_meetings[index]
-            self.assertEqual(actual_meeting.text, self.fix_text(meeting.text))
-            self.assertEqual(actual_meeting.location, self.fix_text(meeting.location))
-            self.assertEqual(actual_meeting.start_time, meeting.start_time)
-            self.assertEqual(actual_meeting.end_time, meeting.end_time)
+            self.assertEqual(self.fix_text(meeting.text), actual_meeting.text, msg=f"text at index {index}")
+            self.assertEqual(self.fix_text(meeting.location), actual_meeting.location, msg=f"location at index {index}")
+            self.assertEqual(meeting.start_time, actual_meeting.start_time, msg=f"start_time at index {index}")
+            self.assertEqual(meeting.end_time, actual_meeting.end_time, msg=f"end_time at index {index}")
 
     @classmethod
     def fix_text(cls, text: str) -> str:

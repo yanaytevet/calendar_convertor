@@ -26,5 +26,6 @@ class CalendarConverter:
     def convert_to_xls(self) -> Tuple[BinaryIO, str]:
         creator = self.CALENDAR_TYPE_TO_MEETING_CREATOR_CLS[self.calendar_type](self.pdf_file)
         meetings = creator.get_meetings()
+        erros = creator.get_errors()
         creator.close()
-        return XlsCreator().create_file(meetings), creator.get_file_name()
+        return XlsCreator().create_file(meetings, erros), creator.get_file_name()
