@@ -167,5 +167,5 @@ class TimeUtils:
         return timedelta(seconds=days * 24 * 60 * 60)
 
     @classmethod
-    def combine_date_and_hour(cls, date: DateType, hour: float) -> TimeType:
-        return cls.create_aware_datetime(date.year, date.month, date.day) + timedelta(hours=hour)
+    def combine_date_and_hour(cls, date: DateType, hour: float, minutes: float = 0) -> TimeType:
+        return cls.create_aware_datetime(date.year, date.month, date.day) + timedelta(hours=hour, minutes=minutes)

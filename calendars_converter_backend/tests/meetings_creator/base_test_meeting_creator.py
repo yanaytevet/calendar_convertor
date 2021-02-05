@@ -20,6 +20,7 @@ class BaseTestMeetingCreator(unittest.TestCase):
                 print("Errors:")
                 for error in errors:
                     print(error)
+        meetings.sort(key=lambda meeting: (meeting.start_time, meeting.text))
         return meetings
 
     def print_meetings(self, meetings: List[Meeting], index: int) -> None:
