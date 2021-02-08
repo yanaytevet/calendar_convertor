@@ -31,8 +31,8 @@ class XlsCreator:
             worksheet.write(index, 0, meeting.start_time.strftime(self.TIME_FORMAT))
             if meeting.end_time is not None:
                 worksheet.write(index, 1, meeting.end_time.strftime(self.TIME_FORMAT))
-            worksheet.write(index, 2, meeting.text)
-            worksheet.write(index, 3, meeting.location)
+            worksheet.write(index, 2, str(meeting.text))
+            worksheet.write(index, 3, str(meeting.location))
             index += 1
 
         if errors:

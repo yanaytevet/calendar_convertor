@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/app
+    expose:
+      - 5000
+
+  ngrok:
+    image: wernight/ngrok:latest
+    ports:
+      - 4040:4040
+    environment:
+      NGROK_PROTOCOL: http
+      NGROK_PORT: backend:5000
+      NGROK_AUTH: 1ke42KSzGIQqZ5bArcleRmyCKol_2TFtPpbN5RMZP9U8EzjXy
+    depends_on:
+      - backend
