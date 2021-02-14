@@ -7,10 +7,40 @@ from calendar_convertor.meetings.meetings_creator.table_meeting_creator import T
 from tests.meetings_creator.base_test_meeting_creator import BaseTestMeetingCreator
 
 
-class TestDailyMeetingCreator(BaseTestMeetingCreator):
+class TestTableMeetingCreator(BaseTestMeetingCreator):
     @classmethod
     def get_creator(cls, file_obj: FileStorage) -> MeetingCreator:
         return TableMeetingCreator(file_obj)
+
+    def test_table_1(self):
+        meetings = self.get_meetings("table/table_1")
+        self.print_meetings(meetings, 0)
+        self.assert_meetings_len(meetings, 139)
+        self.assert_meetings_indexes(
+            [
+                (0, Meeting(text="תקשורת",
+                            location="",
+                            start_time=TimeUtils.create_aware_datetime(2020, 8, 2, 9),
+                            end_time=None)),
+                (1, Meeting(text="ישבת שרינו כחול-לבן",
+                            location="",
+                            start_time=TimeUtils.create_aware_datetime(2020, 8, 2, 9, 30),
+                            end_time=None)),
+                (20, Meeting(text="מליאה",
+                             location="",
+                             start_time=TimeUtils.create_aware_datetime(2020, 8, 5, 11),
+                             end_time=None)),
+                (51, Meeting(text='פ.ע מנכ"לית',
+                             location="",
+                             start_time=TimeUtils.create_aware_datetime(2020, 8, 12, 15, 30),
+                             end_time=None)),
+                (100, Meeting(text="תקשורת",
+                              location="",
+                              start_time=TimeUtils.create_aware_datetime(2020, 8, 23, 18),
+                              end_time=None)),
+            ],
+            meetings
+        )
 
     def test_table_3(self):
         meetings = self.get_meetings("table/table_3")

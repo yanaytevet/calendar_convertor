@@ -66,7 +66,7 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
         meetings = self.get_meetings("daily/daily_5")
         self.assert_meetings([
             Meeting(text="סיור עם צוות חינוך",
-                    location="""ליבורנו 17 בת ים ,בי"ס הנשיא שמורה לךחנייה מול בית הספר ברחבת בית הכנסת; )לכשתגיע למקום ליצור קשר עם מיטל( 052-3604065; שאול מרידור""",
+                    location="""ליבורנו 17 בת ים ,בי"ס הנשיא שמורה לךחנייה מול בית הספר ברחבת בית הכנסת; (לכשתגיע למקום ליצור קשר עם מיטל) 052-3604065; שאול מרידור""",
                     start_time=TimeUtils.create_aware_datetime(2019, 1, 10, 8, 30),
                     end_time=TimeUtils.create_aware_datetime(2019, 1, 10, 14, 30)),
         ], meetings)
@@ -94,3 +94,30 @@ class TestDailyMeetingCreator(BaseTestMeetingCreator):
     def test_daily_8(self):
         meetings = self.get_meetings("daily/daily_8")
         self.assert_meetings(meetings, [])
+
+    def test_daily_10(self):
+        meetings = self.get_meetings("daily/daily_10")
+        self.assert_meetings_len(meetings, 293)
+        self.print_meetings(meetings, 0)
+        self.assert_meetings_indexes(
+            [
+                (0, Meeting(text="קבלת כרטיס וצילום בהיתרים ;",
+                            location="הכנסת",
+                            start_time=TimeUtils.create_aware_datetime(2020, 7, 1, 9, 30),
+                            end_time=TimeUtils.create_aware_datetime(2020, 7, 1, 10, 0))),
+            ],
+            meetings
+        )
+
+    def test_daily_11(self):
+        meetings = self.get_meetings("daily/daily_11")
+        self.assert_meetings_len(meetings, 226)
+        self.assert_meetings_indexes(
+            [
+                (0, Meeting(text="נסיעה לבית הנשיא;",
+                            location="קרנית פלוג",
+                            start_time=TimeUtils.create_aware_datetime(2016, 4, 3, 10),
+                            end_time=TimeUtils.create_aware_datetime(2016, 4, 3, 10, 30))),
+            ],
+            meetings
+        )

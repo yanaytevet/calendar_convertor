@@ -20,8 +20,15 @@ class PdfStringUtils:
                     ascii_arr = []
                 arr.append(letter)
             else:
+                if letter == "(":
+                    letter = ")"
+                elif letter == ")":
+                    letter = "("
                 ascii_arr.append(letter)
         if ascii_arr:
             ascii_arr.reverse()
             arr.extend(ascii_arr)
-        return "".join(arr)[::-1].strip()
+        res = "".join(arr)[::-1].strip()
+        res = res.replace("( ", " (")
+        res = res.replace(" )", ") ")
+        return res

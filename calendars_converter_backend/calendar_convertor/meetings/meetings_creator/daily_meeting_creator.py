@@ -93,7 +93,10 @@ class DailyMeetingCreator(FitzMeetingCreator):
     def drawing_is_meeting(cls, drawing: JSONType) -> bool:
         if not drawing["fill"]:
             return False
-        r, g, b = drawing["fill"]
+        fill = drawing["fill"]
+        if len(fill) != 3:
+            return False
+        r, g, b = fill
         if r == g and g == b:
             return False
         if drawing["rect"][2] - drawing["rect"][0] <= 10:
@@ -137,10 +140,11 @@ class DailyMeetingCreator(FitzMeetingCreator):
             for line in lines:
                 spans = line["spans"]
                 for span in spans:
-                    lower_font = span["font"].lower()
-                    upper = "bold" in lower_font or "f2" in lower_font
-                    text = span["text"]
+                    upper = self.is_bold(span)
+                    text = span["text"].strip()
                     bbox = span["bbox"]
+                    if text == "00":
+                        continue
                     if current_hour_ind == self.MAX_HOUR_IND:
                         text = PdfStringUtils.fix_text(text)
                         text_element = TextElement(
@@ -167,6 +171,9 @@ class DailyMeetingCreator(FitzMeetingCreator):
                         current_hour_ind = 0
                         hours_elements = []
         return hours_elements, upper_texts_elements, lower_texts_elements
+
+    def is_bold(self, span: JSONType) -> bool:
+        return bool(span["flags"] & 2 ** 4)
 
     def get_errors(self) -> List[JSONType]:
         return []

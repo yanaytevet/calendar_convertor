@@ -1,5 +1,5 @@
 import io
-from typing import List, BinaryIO, Optional, Any
+from typing import List, BinaryIO, Optional
 
 import xlsxwriter
 
@@ -20,7 +20,7 @@ class XlsCreator:
 
         worksheet.write(0, 0, 'start_time')
         worksheet.write(0, 1, 'end_time')
-        worksheet.write(0, 2, 'text')
+        worksheet.write(0, 2, 'title')
         worksheet.write(0, 3, 'location')
         worksheet.set_column(0, 1, 25)
         worksheet.set_column(2, 3, 100)

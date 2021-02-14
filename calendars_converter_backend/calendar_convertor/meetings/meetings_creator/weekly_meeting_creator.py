@@ -1,4 +1,6 @@
 import re
+import traceback
+from collections import defaultdict
 from typing import List, Tuple, Dict, Optional
 
 import fitz
@@ -14,6 +16,7 @@ from calendar_convertor.meetings.meetings_creator.fitz_meeting_creator import Fi
 class WeeklyMeetingCreator(FitzMeetingCreator):
     DATA_REGEX = re.compile("(\S+) (\d+) (?:ןושאר|ינש|ישילש|יעיבר|ישימח|ישיש|תבש)")
     MEETING_REGEX = re.compile("(\d{2}):(\d{2}) - (\d{2}):(\d{2})(.*)")
+    LOCATION_REGEX = re.compile("\((.*)\)")
 
     def create_meetings_from_page(self, pdf_page: fitz.Page) -> List[Meeting]:
         blocks = pdf_page.get_text('blocks')
@@ -35,16 +38,35 @@ class WeeklyMeetingCreator(FitzMeetingCreator):
         return meetings
 
     def get_month_to_year(self, blocks: List[Tuple[str, ...]]) -> Dict[str, int]:
-        months_arr = blocks[6][4].split("\n")
-        months_arr = months_arr[:2]
         res = {}
-        for month_text in months_arr:
-            month_text = month_text.split(" - ")[-1]
-            for word, new_word in self.MONTHS_MAP.items():
-                month_text = month_text.replace(word, new_word)
-            year, month, _ = month_text.split(" ")
-            res[month] = int(year)
+        stop_after_next = False
+        for block in blocks:
+            if stop_after_next:
+                self.update_month_to_year(block, res)
+                break
+            if " - " not in block[4]:
+                continue
+            self.update_month_to_year(block, res)
+            stop_after_next = True
+        def_value = min(res.values())
+        res = defaultdict(lambda: def_value, res)
         return res
+
+    def update_month_to_year(self, block: Tuple[str, ...], res: Dict[str, int]) -> None:
+        months_arr = block[4].split("\n")
+        for month_text in months_arr:
+            if not month_text:
+                continue
+            for date_str in month_text.split(" - "):
+                for word, new_word in self.MONTHS_MAP.items():
+                    date_str = date_str.replace(word, new_word)
+                date_arr = date_str.split(" ")
+                if len(date_arr) == 3:
+                    year, month, _ = date_arr
+                    res[month] = int(year)
+                elif len(date_arr) == 2:
+                    year, month = date_arr
+                    res[month] = int(year)
 
     def get_errors(self) -> List[JSONType]:
         return []
@@ -70,8 +92,14 @@ class WeeklyMeetingCreator(FitzMeetingCreator):
                 start_time=TimeUtils.combine_date_and_hour(last_date, start_hour, start_minutes),
                 end_time=TimeUtils.combine_date_and_hour(last_date, end_hour, end_minutes),
                 text=meeting_text,
-                location="",
+                location=self.extract_location(meeting_text),
             )
             self.fix_meeting_time(meeting)
             return meeting
         return None
+
+    def extract_location(self, meeting_text: str) -> str:
+        match = self.LOCATION_REGEX.search(meeting_text)
+        if match:
+            return match.group(1)
+        return ""
